@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>PMBOK ITTO 概览</title>
+<style type="text/css">
+	* {margin: 0; padding: 0; border: 0;}
+	html {font-size: 13px;}
+	#head {margin-top: 20px; font-style: '微软雅黑'; font-size: 30px; text-align: center;}
+	#nav {margin: 20px auto 15px; width: 98%;}
+	#nav a {display: inline-block; width: 100px; height: 40px; border: 1px solid #ccc; border-radius: 10px; line-height: 40px; text-align: center; text-decoration: none; color: #000; margin-left: 20px;}
+	#nav a:hover {background: #eee;}
+	#container {}
+	.box {border-top: 1px dashed #999;}
+	/* .box:hover {background: #eee;} */
+	.area {height: 50px; line-height: 50px; font-size: 20px; text-align: center; font-weight: bold;}
+	.item {margin: 10px; display: inline-block; min-width: 300px;}
+	.i-head {height: 40px; line-height: 40px; background: #333; color: #fff; text-align: center;}
+	.i-table {border-left: 1px solid #333;}
+	.i-table th {border-right: 1px solid #333; border-bottom: 1px solid #333; height: 30px; background: #ddd;}
+	.i-table td {border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 10px;}
+	.ele {cursor: pointer;}
+	.hide {display: none;}
+</style>
+</head>
+
+<body>
+	<div id="head">
+		<div>PMBOK 过程组 ITTO 概览</div>
+	</div>
+	<div id="nav">
+		<div>
+			<b>过程组：</b>
+			<a class="IN" href="javascript:Box.print('IN');">启动过程组</a>
+			<a class="PL" href="javascript:Box.print('PL');">规划过程组</a>
+			<a class="EX" href="javascript:Box.print('EX');">执行过程组</a>
+			<a class="MC" href="javascript:Box.print('MC');">监控过程组</a>
+			<a class="CL" href="javascript:Box.print('CL');">收尾过程组</a>
+		</div>
+	</div>
+	<div id="container">
+		<!-- <div class="box">
+			<div class="area">4.项目整合管理</div>
+		</div> -->
+	</div>
+
+	<div id="model" class="hide">
+		<div class="item">
+			<div class="i-head">
+				<!-- <div class="ele">4.1 制定项目章程</div> -->
+			</div>
+			<div class="i-body">
+				<table class="i-table" width="100%" cellpadding="0" cellspacing="0">
+					<thead>
+						<th>输入</th>
+						<th>工具和技术</th>
+						<th>输出</th>
+					</thead>
+					<tbody>
+						<td class="in">
+							<!-- <div class="p4-1-i1"></div>
+							<div class="p4-1-i2"></div>
+							<div class="p4-1-i3"></div> -->
+						</td>
+						<td class="tt">
+							<!-- <div class="p4-1-t1"></div>
+							<div class="p4-1-t2"></div> -->
+						</td>
+						<td class="out">
+							<!-- <div class="p4-1-o1"></div> -->
+						</td>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/data.js"></script>
+	<script type="text/javascript" src="js/color.js"></script>
+	<script type="text/javascript">
+	var Box = {
+		model: '',
+		init: function() {
+			this.model = $('#model .item').html();
+			return this;
+		},
+		build: function(obj) {
+			var ev = (list) => {
+				var html = '', i = 1;
+				for(var v of list) {
+					html += '<div class="ele">' + i + '.' + v + '</div>';
+					i++;
+				}
+				return html;
+			};
+			var id = 'p' + obj.title.split(' ')[0].replace(/\./g, '-');
+			var item = $('<div id="' + id + '" class="item">' + this.model + '<div>');
+			item.find('.i-head').html('<div>' + obj.title + '</div>');
+			item.find('.in').html(ev(obj['in']));
+			item.find('.tt').html(ev(obj['tt']));
+			item.find('.out').html(ev(obj['out']));
+			return item;
+		},
+		draw: function() {
+			var ct = $('#container');
+			for(var area of PMP.data) {
+				var box = $('<div class="box"><div class="area">【 ' + area.area + ' 】</div></div>');
+				ct.append(box);
+				for(var obj of area.list) {
+					box.append(this.build(obj));
+				}
+			}
+			var thiz = this;
+			$('.ele').click(function() {
+				$('.ele').css({'background': '', 'color': '#000'});
+				var c = Color.getDark(), txt = $(this).text().split('.')[1];
+				for(var e of thiz.find(txt)) {
+					e.css({'background': c, 'color': '#fff'});
+				}
+			});
+		},
+		find: function(txt) {
+			var eles = [];
+			$('.ele').each(function() {
+				var t = $(this);
+				if(txt == t.text().split('.')[1]) {
+					eles.push(t);
+				}
+			});
+			return eles;
+		},
+		process: '',
+		print: function(process) {
+			$('#nav a').css('background', '');
+			$('.i-table td').css('background', '');
+			if(this.process && this.process == process) {
+				this.process = '';
+				return;
+			}
+			this.process = process;
+			var c = Color.getLight();
+			$('#nav a.' + process).css('background', c);
+			for(var obj of PMP.listByProcess(process)) {
+				var id = 'p' + obj.title.split(' ')[0].replace(/\./g, '-');
+				$('#' + id + ' .i-table td').css('background', c);
+			}
+		}
+	};
+	$(function() {
+		Box.init().draw();
+	});
+	</script>
+</body>
+</html>
